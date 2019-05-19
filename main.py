@@ -23,7 +23,6 @@ class Blog(db.Model):
 @app.route('/')
 def index():
     blogs = Blog.query.all()
-    
     return render_template('index.html', blogs=blogs)
 
 @app.route('/add-blog', methods=['POST', 'GET'])
