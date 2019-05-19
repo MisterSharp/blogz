@@ -9,6 +9,9 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = "ienzbxotzq"
 
+class User(db.Model)
+    id = db.Column(db.Integer, primary_key=True)
+
 class Blog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
