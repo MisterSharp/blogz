@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template,session, flash
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from helpers import len_check, not_blank
 
@@ -30,9 +30,17 @@ class User(db.Model):
         self.username = username
         self.password = password
 
+@app.before_request
+def require_login():
+    allowed_routes = ["login","register"]
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    users = User.query.all()
+    return render_template('index.html',users=users)
 
 @app.route('/add-blog', methods=['POST', 'GET'])
 def add_blog():
@@ -48,6 +56,11 @@ def add_blog():
         else:
             return render_template('add-blog.html')
     else:
+        #TODO check to see if the user is logged in:
+                #if the user is logged in:
+                    #return render_template('/add-blog.html')
+                #else ** the user is not logged in**:
+                    #redirect('/')
         return render_template('add-blog.html')
     
 
@@ -61,15 +74,50 @@ def get_blog(blog_id):
 @app.route('/login', methods=['POST','GET'])
 def login():
     if request.method == 'POST':
-        #TODO if login is successfull
-            #route to /add-blog
-        pass
-    return render_template('/login')
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if not_blank(username) and not_blank(password):
+            if user and user.password == password:
+                session['username'] = username
+                flash('Logged in')        
+                return redirect('/add-blog')
+            else:
+                return '<h1>Invalid Information was entered </h1>'
+                flash('User password incorrect or user does not exist','error')
+        else:
+            flash('User password incorrect or user does not exist','error')
 
-@app.route('/blogs', methods=['POST'])
-def posted():
+    return render_template('/login.html')
+
+@app.route('/register', methods = ['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+        if password != verify:
+            return render_template('register.html')
+
+        # TODO - validate user's data
+
+        existing_user = User.query.filter_by(username=username).first()
+        if not existing_user:
+            new_user = User(username, password)
+            db.session.add(new_user)
+            db.session.commit()
+            session['username'] = username
+            return redirect('/add-blog')
+        else:
+            # TODO - user better response messaging
+            return "<h1>Duplicate User</h1>"
+    return render_template('/register.html')
+
+
+@app.route('/blogs', methods=['POST','GET'])
+def blogs():
     blogs = Blog.query.all()
-    return render_template('index.html', blogs=blogs)
+    return render_template('blogs.html', blogs=blogs)
 
 
 if __name__ == '__main__':

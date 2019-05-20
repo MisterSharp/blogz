@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-      <title>Build A Blog</title>
+      <title>Blogz Assignment</title>
 </head>
 <body>
+        <div style='float: right'>
+                {% if 'user' in session %}
+                  {{ session['user'] }}
+                  <form action="/logout" method="post">
+                    <input type="submit" value="Log Out" />
+                  </form>
+                {% else %}
+                  <a href="/login">login</a> | <a href="/register">register</a>
+                {% endif %}
+              </div>
+
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/blogs">All Blogs</a></li>
             <li><a href="/add-blog">Add Blog</a></li>
-            <li><a href="/login">Login</a></li>
             <li><a href="/blogs">Logout</a></li>
 
         </ul>
 
     </nav>
-    <h1>Build A Blog</h1>
+    <h1>Blogz Assignment</h1>
     {% block content %}
     {% endblock %}
 </body>
