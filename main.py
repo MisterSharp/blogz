@@ -32,7 +32,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ["login","register","blogs","/<int:blog_id>"]
+    allowed_routes = ["login","register","blogs","/blog/1"]
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -70,7 +70,7 @@ def add_blog():
 @app.route("/blog/<int:blog_id>")
 def get_blog(blog_id):
     blog = Blog.query.get(blog_id)
-    return render_template('index.html',blogs=[blog])
+    return render_template('show-blog.html',blogs=[blog])
 
     
 
@@ -96,7 +96,7 @@ def login():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/')
+    return redirect('/blogs')
 
 @app.route('/register', methods = ['POST', 'GET'])
 def register():
