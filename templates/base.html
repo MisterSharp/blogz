@@ -5,9 +5,9 @@
 </head>
 <body>
         <div style='float: right'>
-                {% if 'user' in session %}
-                  {{ session['user'] }}
-                  <form action="/logout" method="post">
+                {% if 'username' in session %}
+                  {{ session['username'] }}
+                  <form action="/logout" method="get">
                     <input type="submit" value="Log Out" />
                   </form>
                 {% else %}

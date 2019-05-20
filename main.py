@@ -32,9 +32,12 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ["login","register"]
+    allowed_routes = ["login","register","blogs","/<int:blog_id>"]
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
+
+#@app.before_request
+#def show_blog():
 
 
 @app.route('/')
@@ -89,6 +92,11 @@ def login():
             flash('User password incorrect or user does not exist','error')
 
     return render_template('/login.html')
+
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/')
 
 @app.route('/register', methods = ['POST', 'GET'])
 def register():
