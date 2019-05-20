@@ -4,7 +4,7 @@ from helpers import len_check, not_blank
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:codecamp2019@localhost:8889/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:codecamp2019@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = "ienzbxotzq"
@@ -29,22 +29,19 @@ class User(db.Model):
     def __init__(self, username, password,):
         self.username = username
         self.password = password
-        self.owner = owner
-
-
 
 @app.route('/')
 def index():
-    blogs = Blog.query.all()
-    return render_template('index.html', blogs=blogs)
+    return render_template('index.html')
 
 @app.route('/add-blog', methods=['POST', 'GET'])
 def add_blog():
     if request.method == 'POST':
         blog_title = request.form['title']
         blog_body = request.form['body']
+        owner = User.query.filter_by(username=session['username']).first()
         if not_blank(blog_title) and not_blank(blog_body):
-            new_blog = Blog(blog_title, blog_body)
+            new_blog = Blog(blog_title, blog_body,owner)
             db.session.add(new_blog)
             db.session.commit()
             return redirect('/blog/'+ str(new_blog.id))
@@ -61,14 +58,18 @@ def get_blog(blog_id):
 
     
 
-@app.route('/delete-blog', methods=['POST'])
-def delete_blog():
+@app.route('/login', methods=['POST','GET'])
+def login():
+    if request.method == 'POST':
+        #TODO if login is successfull
+            #route to /add-blog
+        pass
+    return render_template('/login')
 
-    return redirect('/')
-
-@app.route('/posted', methods=['POST'])
+@app.route('/blogs', methods=['POST'])
 def posted():
-   return '<h1>Blog Posted</h1>'
+    blogs = Blog.query.all()
+    return render_template('index.html', blogs=blogs)
 
 
 if __name__ == '__main__':
