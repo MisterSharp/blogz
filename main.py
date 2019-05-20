@@ -32,7 +32,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ["login","register","blogs","/blog/1"]
+    allowed_routes = ["login","register","blogs"]
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -59,11 +59,7 @@ def add_blog():
         else:
             return render_template('add-blog.html')
     else:
-        #TODO check to see if the user is logged in:
-                #if the user is logged in:
-                    #return render_template('/add-blog.html')
-                #else ** the user is not logged in**:
-                    #redirect('/')
+
         return render_template('add-blog.html')
     
 
@@ -71,6 +67,11 @@ def add_blog():
 def get_blog(blog_id):
     blog = Blog.query.get(blog_id)
     return render_template('show-blog.html',blogs=[blog])
+
+@app.route("/user/<int:user_id>")
+def get_user_blogs(user_id):
+    user_blogs = Blog.query.filter_by(owner_id=user_id).all()
+    return render_template('user-blogs.html', blogs=user_blogs)
 
     
 
